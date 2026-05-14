@@ -1,4 +1,4 @@
-# Consent Management MVP
+# hyperConsent
 
 Local testable MVP for append-only consent records using Hyperledger Fabric chaincode, a Node.js Fabric Gateway, FastAPI, and React.
 

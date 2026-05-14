@@ -1,0 +1,19 @@
+{
+  "name": "consent-fabric-gateway",
+  "version": "0.1.0",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "dev": "node src/app.js",
+    "start": "node src/app.js",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "@grpc/grpc-js": "^1.10.9",
+    "@hyperledger/fabric-gateway": "^1.7.0",
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {}
+}

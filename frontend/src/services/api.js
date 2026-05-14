@@ -37,5 +37,11 @@ export const api = {
       method: 'PUT',
       headers: { Authorization: `Bearer ${token}` }
     });
+  },
+  grantConsent(token, id) {
+    return request(`/consents/${id}/grant`, {
+      method: 'PUT',
+      headers: { Authorization: `Bearer ${token}` }
+    });
   }
 };

@@ -9,7 +9,7 @@ The Node gateway defaults to `FABRIC_MOCK=true`, which keeps append-only consent
 Each consent record is stored as a versioned ledger entry:
 
 - `CONSENT#<consent_id>#v000001` for the original grant/revoke decision.
-- `CONSENT#<consent_id>#v000002` and onward for later changes such as revoke.
+- `CONSENT#<consent_id>#v000002` and onward for later changes such as revoke or grant.
 
 Older versions are never overwritten. The current state is derived by reading the highest version for a consent ID.
 

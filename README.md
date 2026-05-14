@@ -10,7 +10,7 @@ Local testable MVP for append-only consent records using Hyperledger Fabric chai
 - `frontend`: React/Vite consent UI.
 - `docker`: Dockerfiles and compose setup for the application services.
 
-Consent changes are versioned. A revoke action creates `CONSENT#<id>#v000002` instead of overwriting `CONSENT#<id>#v000001`.
+Consent changes are versioned. A revoke or grant action creates `CONSENT#<id>#v000002` and onward instead of overwriting `CONSENT#<id>#v000001`.
 
 By default the Docker app runs in mock gateway mode (`FABRIC_MOCK=true`). That mode uses an in-memory JavaScript `Map` so the API and UI can be tested before Fabric certificates are configured. It is not writing to a real Fabric ledger until `FABRIC_MOCK=false` and Fabric identity/TLS variables are provided.
 

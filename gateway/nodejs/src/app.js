@@ -61,6 +61,14 @@ app.put('/consents/:id/revoke', async (req, res, next) => {
   }
 });
 
+app.put('/consents/:id/grant', async (req, res, next) => {
+  try {
+    res.json(await gateway.grantConsent(req.params.id));
+  } catch (error) {
+    next(error);
+  }
+});
+
 app.use((error, _req, res, _next) => {
   const message = error.message || 'Gateway error';
   const status = message.includes('not found') ? 404 : 400;

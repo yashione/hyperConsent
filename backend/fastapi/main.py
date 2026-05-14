@@ -100,3 +100,11 @@ async def revoke_consent(
     _current_user: User = Depends(get_current_user),
 ):
     return await gateway_request("PUT", f"/consents/{consent_id}/revoke")
+
+
+@app.put("/consents/{consent_id}/grant", response_model=ConsentResponse)
+async def grant_consent(
+    consent_id: str,
+    _current_user: User = Depends(get_current_user),
+):
+    return await gateway_request("PUT", f"/consents/{consent_id}/grant")

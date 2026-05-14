@@ -40,6 +40,10 @@ button.selected.grant {
   background: #1f6f5b;
 }
 
+button.grant-action {
+  background: #1f6f5b;
+}
+
 button.selected.revoke {
   background: #a23b3b;
 }

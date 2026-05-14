@@ -114,14 +114,23 @@ async function getConsentHistory(id) {
 }
 
 async function revokeConsent(id) {
+  return appendConsentAction(id, 'REVOKED');
+}
+
+async function grantConsent(id) {
+  return appendConsentAction(id, 'GRANTED');
+}
+
+async function appendConsentAction(id, status) {
   if (mode === 'fabric') {
-    await submitFabric('RevokeConsent', [id], id);
+    const transactionName = status === 'GRANTED' ? 'GrantConsent' : 'RevokeConsent';
+    await submitFabric(transactionName, [id], id);
     return evaluateFabric('GetConsent', [id]);
   }
 
   const consent = await getConsent(id);
-  if (consent.status === 'REVOKED') {
-    throw new Error(`consent ${id} is already revoked`);
+  if (consent.status === status) {
+    throw new Error(`consent ${id} is already ${status}`);
   }
 
   const now = new Date().toISOString();
@@ -135,8 +144,8 @@ async function revokeConsent(id) {
     user_id: consent.user_id,
     consumer_id: consent.consumer_id,
     purpose: consent.purpose,
-    status: 'REVOKED',
-    action: 'REVOKED',
+    status,
+    action: status,
     previous_version_id: consent.id,
     created_at: now,
     updated_at: now,
@@ -194,5 +203,6 @@ module.exports = {
   getConsent,
   listConsents,
   getConsentHistory,
+  grantConsent,
   revokeConsent
 };

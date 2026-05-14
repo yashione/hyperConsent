@@ -47,6 +47,11 @@ function App() {
     await refresh();
   }
 
+  async function grant(id) {
+    await api.grantConsent(token, id);
+    await refresh();
+  }
+
   if (!token) {
     return (
       <main className="auth-shell">
@@ -139,6 +144,8 @@ function App() {
                 </span>
                 {consent.is_latest && consent.status === 'GRANTED' ? (
                   <button onClick={() => revoke(consent.consent_id)}>Revoke</button>
+                ) : consent.is_latest && consent.status === 'REVOKED' ? (
+                  <button className="grant-action" onClick={() => grant(consent.consent_id)}>Grant</button>
                 ) : (
                   <span className="locked">Locked</span>
                 )}

@@ -1,4 +1,12 @@
 services:
+  couchdb:
+    image: couchdb:3.3
+    environment:
+      COUCHDB_USER: admin
+      COUCHDB_PASSWORD: admin123
+    ports:
+      - "5984:5984"
+
   gateway:
     build:
       context: ..
@@ -6,8 +14,12 @@ services:
     environment:
       FABRIC_MOCK: "true"
       PORT: "3001"
+      DB_TYPE: "couchdb"
+      COUCHDB_URL: "http://admin:admin123@couchdb:5984"
     ports:
       - "3002:3001"
+    depends_on:
+      - couchdb
 
   backend:
     build:

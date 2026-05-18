@@ -94,6 +94,16 @@ async def list_consents(
     return await gateway_request("GET", "/consents", params=params)
 
 
+@app.get("/audit")
+async def audit_ledger(
+    _current_user: User = Depends(get_current_user),
+):
+    """Invoke on‑chain auditor to verify the whole ledger.
+    Returns "passed" or "failed" as provided by chaincode.
+    """
+    return await gateway_request("GET", "/verify-ledger")
+
+
 @app.put("/consents/{consent_id}/revoke", response_model=ConsentResponse)
 async def revoke_consent(
     consent_id: str,

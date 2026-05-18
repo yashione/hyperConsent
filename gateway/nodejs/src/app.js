@@ -9,8 +9,23 @@ const port = process.env.PORT || 3001;
 app.use(cors());
 app.use(express.json());
 
+// DEBUG LOGGER
+app.use((req, res, next) => {
+  console.log(`[DEBUG] ${req.method} ${req.url}`);
+  next();
+});
+
 app.get('/health', (_req, res) => {
   res.json({ status: 'ok', mode: gateway.mode });
+});
+
+app.get('/verify-ledger', async (req, res, next) => {
+  try {
+    const result = await gateway.auditLedger();
+    res.json({ result });
+  } catch (error) {
+    next(error);
+  }
 });
 
 app.post('/consents', async (req, res, next) => {
@@ -68,6 +83,7 @@ app.put('/consents/:id/grant', async (req, res, next) => {
     next(error);
   }
 });
+
 
 app.use((error, _req, res, _next) => {
   const message = error.message || 'Gateway error';

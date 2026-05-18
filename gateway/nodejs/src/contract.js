@@ -196,6 +196,14 @@ async function connectFabric() {
   const gateway = connect({ client, identity: credentials, signer });
   return gateway.getNetwork(channelName).getContract(chaincodeName);
 }
+async function auditLedger() {
+  if (mode === 'fabric') {
+    // Calls the chaincode auditor; returns "passed" or "failed"
+    return await evaluateFabric('AuditLedger', []);
+  }
+  // In mock mode, we assume the in-memory store is always consistent for now
+  return "passed";
+}
 
 module.exports = {
   mode,
@@ -204,5 +212,6 @@ module.exports = {
   listConsents,
   getConsentHistory,
   grantConsent,
-  revokeConsent
+  revokeConsent,
+  auditLedger,
 };

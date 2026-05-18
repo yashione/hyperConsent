@@ -43,5 +43,10 @@ export const api = {
       method: 'PUT',
       headers: { Authorization: `Bearer ${token}` }
     });
+  },
+  auditLedger(token) {
+    return request('/audit', {
+      headers: { Authorization: `Bearer ${token}` }
+    });
   }
 };

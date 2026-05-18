@@ -155,11 +155,22 @@ header p {
   padding: 10px 12px;
 }
 
-.workspace {
+.workspace-grid {
   align-items: start;
   display: grid;
+  gap: 24px;
+  grid-template-columns: 360px 1fr;
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
   gap: 20px;
-  grid-template-columns: 320px 1fr;
+}
+
+.main-content {
+  display: flex;
+  flex-direction: column;
 }
 
 .consent-form,
@@ -236,9 +247,275 @@ header p {
   font-weight: 750;
 }
 
-@media (max-width: 760px) {
-  .workspace,
-  .row {
+@media (max-width: 960px) {
+  .workspace-grid {
     grid-template-columns: 1fr;
   }
 }
+
+@media (max-width: 760px) {
+  .row {
+    grid-template-columns: 1fr;
+    height: auto;
+    padding: 16px;
+    gap: 8px;
+  }
+  .row * {
+    overflow: visible;
+    text-overflow: clip;
+    white-space: normal;
+  }
+  .table-head {
+    display: none;
+  }
+}
+
+/* ==========================================
+   PREMIUM AUDIT PANEL STYLES
+   ========================================== */
+
+.audit-panel {
+  background: white;
+  border: 1px solid #e1e5ea;
+  border-radius: 12px;
+  box-shadow: 0 12px 32px rgba(23, 32, 42, 0.06);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.audit-panel:hover {
+  box-shadow: 0 16px 40px rgba(23, 32, 42, 0.1);
+}
+
+.audit-header {
+  align-items: center;
+  background: linear-gradient(135deg, #1a2530 0%, #2c3e50 100%);
+  color: white;
+  display: flex;
+  gap: 10px;
+  padding: 16px 20px;
+}
+
+.audit-header h2 {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  margin: 0;
+  color: #f6f7f9;
+}
+
+.header-icon {
+  color: #3498db;
+}
+
+.audit-body {
+  align-items: center;
+  display: flex;
+  gap: 20px;
+  padding: 24px 20px;
+  border-bottom: 1px solid #f0f2f5;
+  transition: background 0.3s ease;
+}
+
+/* Status-specific background modifications */
+.audit-body.status-passed {
+  background: rgba(31, 111, 91, 0.02);
+}
+.audit-body.status-failed {
+  background: rgba(162, 59, 59, 0.02);
+}
+
+.status-avatar {
+  align-items: center;
+  border-radius: 50%;
+  display: flex;
+  height: 80px;
+  justify-content: center;
+  width: 80px;
+  flex-shrink: 0;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Status Avatars Styling and Glows */
+.status-avatar.idle {
+  background: #f0f4f8;
+  color: #7f8c8d;
+}
+
+.status-avatar.loading {
+  background: rgba(52, 152, 219, 0.1);
+  color: #3498db;
+}
+
+.status-avatar.passed {
+  background: rgba(31, 111, 91, 0.1);
+  color: #1f6f5b;
+  box-shadow: 0 0 20px rgba(31, 111, 91, 0.2);
+}
+
+.status-avatar.failed {
+  background: rgba(162, 59, 59, 0.1);
+  color: #a23b3b;
+  box-shadow: 0 0 20px rgba(162, 59, 59, 0.2);
+}
+
+.audit-info {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.audit-info h3 {
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0;
+  color: #2c3e50;
+}
+
+.audit-description {
+  color: #7f8c8d;
+  font-size: 13px;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.status-passed .audit-description {
+  color: #27ae60;
+}
+
+.status-failed .audit-description {
+  color: #c0392b;
+  font-family: ui-monospace, monospace;
+  font-size: 12px;
+  background: #fdf2f2;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #fecdcd;
+}
+
+.last-run {
+  color: #95a5a6;
+  font-size: 11px;
+  margin-top: 4px;
+}
+
+.audit-footer {
+  background: #fafbfc;
+  padding: 16px 20px;
+}
+
+.audit-btn {
+  background: #2c3e50;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+  width: 100%;
+}
+
+.audit-btn:hover {
+  background: #34495e;
+}
+
+.audit-btn:active {
+  transform: scale(0.98);
+}
+
+.audit-btn.loading {
+  background: #95a5a6;
+  cursor: not-allowed;
+}
+
+/* Animations */
+.icon-spin {
+  animation: spin 1.2s linear infinite;
+}
+
+.icon-pulse {
+  animation: pulse-avatar 2s infinite ease-in-out;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes pulse-avatar {
+  0% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.05); opacity: 1; }
+  100% { transform: scale(1); opacity: 0.8; }
+}
+
+/* Brand logo styling */
+.login-logo-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+
+.login-logo {
+  color: #1f6f5b;
+}
+
+.login-subtitle {
+  color: #7f8c8d;
+  font-size: 13px;
+  text-align: center;
+  margin: -10px 0 10px 0;
+}
+
+.brand-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.app-header {
+  border-bottom: 1px solid #e1e5ea;
+  padding-bottom: 18px;
+}
+
+.dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+.field-label {
+  font-size: 14px;
+  font-weight: 650;
+  margin-bottom: 6px;
+  display: block;
+}
+
+.decision-group-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.table-wrapper {
+  overflow-x: auto;
+  border-radius: 8px;
+  border: 1px solid #e1e5ea;
+}
+
+.table {
+  min-width: 800px;
+}
+
+.row.consent-row {
+  border: none;
+  border-bottom: 1px solid #f0f2f5;
+  border-radius: 0;
+}
+
+.row.consent-row:last-child {
+  border-bottom: none;
+}
+

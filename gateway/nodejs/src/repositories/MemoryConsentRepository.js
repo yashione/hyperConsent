@@ -1,5 +1,6 @@
 const IConsentRepository = require('./IConsentRepository');
 const ConsentHasher = require('../utils/ConsentHasher');
+const ConsentSigner = require('../utils/ConsentSigner');
 
 /**
  * Concrete implementation of IConsentRepository backed by an in-memory Map.
@@ -81,6 +82,10 @@ class MemoryConsentRepository extends IConsentRepository {
     const hash = ConsentHasher.calculateHash(consent, '0');
     consent.hash = hash;
     consent.previous_hash = '0';
+
+    // Generate asymmetric digital signature using the Private Key
+    const signature = ConsentSigner.signConsent(consent, '0');
+    consent.signature = signature;
     this.store.set(key, consent);
     return consent;
   }
@@ -141,6 +146,10 @@ class MemoryConsentRepository extends IConsentRepository {
     const nextHash = ConsentHasher.calculateHash(next, previousHash);
     next.hash = nextHash;
     next.previous_hash = previousHash;
+
+    // Generate asymmetric digital signature linked to previous block hash
+    const signature = ConsentSigner.signConsent(next, previousHash);
+    next.signature = signature;
     this.store.set(key, next);
     return next;
   }
@@ -189,6 +198,15 @@ class MemoryConsentRepository extends IConsentRepository {
           if (doc.hash !== computedHash) {
             throw new Error(`integrity error: cryptographic signature mismatch at version ${doc.version} of consent ${consentId} (expected hash "${computedHash}", got "${doc.hash}"). Document has been tampered with!`);
           }
+        }
+
+        // Verify elliptic curve digital signature to prove origin authenticity (Mandatory!)
+        if (!doc.signature) {
+          throw new Error(`security error: digital signature is missing at version ${doc.version} of consent ${consentId}. This document has been manually injected (unsigned)!`);
+        }
+        const isValidSig = ConsentSigner.verifyConsent(doc, doc.signature, doc.previous_hash || '0');
+        if (!isValidSig) {
+          throw new Error(`security error: digital signature verification failed at version ${doc.version} of consent ${consentId}. This document has been manually injected or forged (Private Key signature is invalid)!`);
         }
       }
     }

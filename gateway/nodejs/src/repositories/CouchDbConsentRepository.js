@@ -1,6 +1,7 @@
 const IConsentRepository = require('./IConsentRepository');
 const ConsentHasher = require('../utils/ConsentHasher');
 const ConsentSigner = require('../utils/ConsentSigner');
+const TransactionLogManager = require('../utils/TransactionLogManager');
 
 /**
  * Concrete implementation of IConsentRepository backed by CouchDB.
@@ -193,6 +194,9 @@ class CouchDbConsentRepository extends IConsentRepository {
       method: 'PUT',
       body: JSON.stringify(consent)
     });
+
+    // Append this successful Genesis transaction to the append-only log file
+    TransactionLogManager.logWrite(consent);
     if (!res.ok) {
       const text = await res.text();
       console.error(`[CouchDB DEBUG] PUT failed for key "${key}":`, text);
@@ -298,6 +302,9 @@ class CouchDbConsentRepository extends IConsentRepository {
       method: 'PUT',
       body: JSON.stringify(next)
     });
+
+    // Append this successful update transaction to the append-only log file
+    TransactionLogManager.logWrite(next);
     if (!res.ok) {
       const text = await res.text();
       console.error(`[CouchDB DEBUG] PUT failed for key "${key}":`, text);
@@ -381,6 +388,45 @@ class CouchDbConsentRepository extends IConsentRepository {
       }
     }
     return 'passed';
+  }
+
+  async getAllConsentsRaw() {
+    const res = await this.request('/_all_docs?include_docs=true');
+    if (!res.ok) {
+      const text = await res.text();
+      console.error(`[CouchDB DEBUG] getAllConsentsRaw failed:`, text);
+      return [];
+    }
+    const data = await res.json();
+    if (!data || !data.rows) return [];
+    return data.rows
+      .map(row => row.doc)
+      .filter(doc => doc && doc.docType === 'consent_version');
+  }
+
+  async deleteConsentVersion(id, rev) {
+    const res = await this.request(`/${encodeURIComponent(id)}?rev=${rev}`, {
+      method: 'DELETE'
+    });
+    if (!res.ok) {
+      const text = await res.text();
+      console.error(`[CouchDB DEBUG] deleteConsentVersion failed for key "${id}":`, text);
+      throw new Error(`Failed to delete consent version: ${text}`);
+    }
+    return res;
+  }
+
+  async updateConsentVersion(id, doc) {
+    const res = await this.request(`/${encodeURIComponent(id)}`, {
+      method: 'PUT',
+      body: JSON.stringify(doc)
+    });
+    if (!res.ok) {
+      const text = await res.text();
+      console.error(`[CouchDB DEBUG] updateConsentVersion failed for key "${id}":`, text);
+      throw new Error(`Failed to update consent version: ${text}`);
+    }
+    return res;
   }
 }
 

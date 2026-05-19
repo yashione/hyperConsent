@@ -48,5 +48,15 @@ export const api = {
     return request('/audit', {
       headers: { Authorization: `Bearer ${token}` }
     });
+  },
+  healLedger(token, strategy = 'REPLAY_LOG') {
+    return request('/audit/heal', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ strategy })
+    });
   }
 };

@@ -104,6 +104,16 @@ async def audit_ledger(
     return await gateway_request("GET", "/verify-ledger")
 
 
+@app.post("/audit/heal")
+async def heal_ledger(
+    strategy: str = "REPLAY_LOG",
+    _current_user: User = Depends(get_current_user),
+):
+    """Invoke on‑chain self-healing recovery to rollback/restore ledger state.
+    """
+    return await gateway_request("POST", "/heal-ledger", json={"strategy": strategy})
+
+
 @app.put("/consents/{consent_id}/revoke", response_model=ConsentResponse)
 async def revoke_consent(
     consent_id: str,

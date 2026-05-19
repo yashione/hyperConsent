@@ -28,6 +28,19 @@ app.get('/verify-ledger', async (req, res, next) => {
   }
 });
 
+const ConsentSelfHealer = require('./utils/ConsentSelfHealer');
+
+app.post('/heal-ledger', async (req, res, next) => {
+  try {
+    const strategy = req.body.strategy || 'REPLAY_LOG';
+    const healer = new ConsentSelfHealer(gateway.repository, strategy);
+    const report = await healer.healLedger();
+    res.json(report);
+  } catch (error) {
+    next(error);
+  }
+});
+
 app.post('/consents', async (req, res, next) => {
   try {
     const id = req.body.id || randomUUID();
@@ -86,6 +99,7 @@ app.put('/consents/:id/grant', async (req, res, next) => {
 
 
 app.use((error, _req, res, _next) => {
+  console.error('[GATEWAY ERROR] Route threw exception:', error);
   const message = error.message || 'Gateway error';
   const status = message.includes('not found') ? 404 : 400;
   res.status(status).json({ detail: message });

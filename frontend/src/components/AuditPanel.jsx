@@ -1,10 +1,14 @@
 import React, { useState } from 'react';
-import { Loader2, Shield, ShieldAlert, ShieldCheck } from 'lucide-react';
+import { Loader2, Shield, ShieldAlert, ShieldCheck, Sparkles } from 'lucide-react';
 
 export function AuditPanel({ token, api }) {
   const [status, setStatus] = useState('idle'); // 'idle' | 'loading' | 'passed' | 'failed'
   const [errorMsg, setErrorMsg] = useState('');
   const [lastAuditTime, setLastAuditTime] = useState(null);
+  
+  // Healing state management
+  const [healStatus, setHealStatus] = useState('idle'); // 'idle' | 'loading' | 'success' | 'failed'
+  const [healReport, setHealReport] = useState([]);
 
   const runAudit = async () => {
     setStatus('loading');
@@ -26,6 +30,29 @@ export function AuditPanel({ token, api }) {
       setErrorMsg(err.message || 'Audit request failed');
     } finally {
       setLastAuditTime(new Date().toLocaleTimeString());
+    }
+  };
+
+  const runHealing = async () => {
+    setHealStatus('loading');
+    setHealReport([]);
+    try {
+      // Simulate slight healing animation delay
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const res = await api.healLedger(token, 'REPLAY_LOG');
+      
+      if (res.status === 'SUCCESS') {
+        setHealStatus('success');
+        setHealReport(res.recoveryReports || []);
+        // Instantly re-verify ledger to turn the UI green!
+        await runAudit();
+      } else {
+        setHealStatus('failed');
+        setErrorMsg('Disaster recovery failed to run.');
+      }
+    } catch (err) {
+      setHealStatus('failed');
+      setErrorMsg(err.message || 'Disaster recovery request failed.');
     }
   };
 
@@ -80,6 +107,21 @@ export function AuditPanel({ token, api }) {
               Last audited at: <strong>{lastAuditTime}</strong>
             </span>
           )}
+
+          {/* Cryptographic Recovery Report Alert */}
+          {healReport.length > 0 && (
+            <div className="heal-report-alert">
+              <div className="heal-report-title">
+                <Sparkles size={14} />
+                Cryptographic Self-Heal Report
+              </div>
+              {healReport.map((rep, idx) => (
+                <div key={idx} style={{ marginTop: '4px' }}>
+                  <strong>Consent {rep.consentId.substring(0, 8)}...</strong>: {rep.details}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
@@ -87,7 +129,7 @@ export function AuditPanel({ token, api }) {
         <button 
           className={`audit-btn ${status === 'loading' ? 'loading' : ''}`}
           onClick={runAudit}
-          disabled={status === 'loading'}
+          disabled={status === 'loading' || healStatus === 'loading'}
         >
           {status === 'loading' ? (
             <>
@@ -98,6 +140,26 @@ export function AuditPanel({ token, api }) {
             'Verify Cryptographic Integrity'
           )}
         </button>
+
+        {status === 'failed' && (
+          <button 
+            className={`heal-btn ${healStatus === 'loading' ? 'loading' : ''}`}
+            onClick={runHealing}
+            disabled={status === 'loading' || healStatus === 'loading'}
+          >
+            {healStatus === 'loading' ? (
+              <>
+                <Loader2 className="icon-spin" size={16} />
+                Healing Ledger...
+              </>
+            ) : (
+              <>
+                <Sparkles size={16} />
+                Self-Heal Ledger (Restore)
+              </>
+            )}
+          </button>
+        )}
       </div>
     </section>
   );

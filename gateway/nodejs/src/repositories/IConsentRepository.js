@@ -30,6 +30,18 @@ class IConsentRepository {
   async auditLedger() {
     throw new Error('Method "auditLedger" must be implemented.');
   }
+
+  async getAllConsentsRaw() {
+    throw new Error('Method "getAllConsentsRaw" must be implemented.');
+  }
+
+  async deleteConsentVersion(id, rev) {
+    throw new Error('Method "deleteConsentVersion" must be implemented.');
+  }
+
+  async updateConsentVersion(id, doc) {
+    throw new Error('Method "updateConsentVersion" must be implemented.');
+  }
 }
 
 module.exports = IConsentRepository;

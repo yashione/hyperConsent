@@ -57,6 +57,7 @@ async function auditLedger() {
 
 module.exports = {
   mode,
+  repository,
   createConsent,
   getConsent,
   listConsents,

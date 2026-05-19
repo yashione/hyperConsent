@@ -18,6 +18,8 @@ services:
       COUCHDB_URL: "http://admin:admin123@couchdb:5984"
     ports:
       - "3002:3001"
+    volumes:
+      - ../gateway/nodejs/keys:/app/keys
     depends_on:
       - couchdb
 

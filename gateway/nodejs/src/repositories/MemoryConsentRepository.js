@@ -1,6 +1,7 @@
 const IConsentRepository = require('./IConsentRepository');
 const ConsentHasher = require('../utils/ConsentHasher');
 const ConsentSigner = require('../utils/ConsentSigner');
+const TransactionLogManager = require('../utils/TransactionLogManager');
 
 /**
  * Concrete implementation of IConsentRepository backed by an in-memory Map.
@@ -87,6 +88,9 @@ class MemoryConsentRepository extends IConsentRepository {
     const signature = ConsentSigner.signConsent(consent, '0');
     consent.signature = signature;
     this.store.set(key, consent);
+    
+    // Log the transaction in the append-only ledger log
+    TransactionLogManager.logWrite(consent);
     return consent;
   }
 
@@ -151,6 +155,9 @@ class MemoryConsentRepository extends IConsentRepository {
     const signature = ConsentSigner.signConsent(next, previousHash);
     next.signature = signature;
     this.store.set(key, next);
+    
+    // Log the transaction in the append-only ledger log
+    TransactionLogManager.logWrite(next);
     return next;
   }
 
@@ -211,6 +218,21 @@ class MemoryConsentRepository extends IConsentRepository {
       }
     }
     return 'passed';
+  }
+
+  async getAllConsentsRaw() {
+    return Array.from(this.store.values())
+      .filter(doc => doc && doc.docType === 'consent_version');
+  }
+
+  async deleteConsentVersion(id, rev) {
+    this.store.delete(id);
+    return { ok: true };
+  }
+
+  async updateConsentVersion(id, doc) {
+    this.store.set(id, doc);
+    return { ok: true };
   }
 }
 
